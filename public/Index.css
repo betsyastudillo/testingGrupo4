@@ -1,42 +1,114 @@
 *{
-    padding: 0;
-    margin: 0;
-    /*Para quitar estilos por defecto del navegador*/
-    box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
 }
 
 body {
-    font-family: sans-serif;
+  background-color: #D4F6FF;
 }
-header{
-    display: flex;
-    height: 50px;
-    background-color: #222;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
+
+.custom-navbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  background: #000B58;
+}
+
+.container-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.logo-navbar {
+  width: 100px;
+  height: 80px;
+}
+
+.navbar-menu {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.navbar-nav{
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-nav a {
+  color: white;      
+  text-decoration: none;
+  font-family: 'Courier New', Courier, monospace;   
+  font-size: 1.2rem;
+  padding: 0 65px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.icon-navbar ul {
+  display: flex;
+  list-style: none;
+  gap: 15px;
+}
+
+.icon-navbar a {
+  text-decoration: none;
+  font-size: 1.5rem;
+  color: white;      
+}
+
+.custom-toggler {
+  display: none;
+  background-color: transparent;
+  color: white;
+  font-size: 2rem;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-navbar ul li {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.navbar-nav a:hover, .icon-navbar i:hover{
+  color: #12f370; 
+}
+
+/* header{
+  display: flex;
+  height: 50px;
+  background-color: #C6E7FF;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
 }
 
 .nombre-empresa{
-    color: #fff;
+  color: #000B58;
 }
 
 .logo{
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .logo img {
-    height: 50px;
-    color: black;
+  height: 50px;
+  color: black;
 }
 
 nav {
-    width: 40%;
-    display: flex;
-    flex-direction: row;
-    text-align: center;
-    align-items: center;
+  width: 40%;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  align-items: center;
 }
 
 nav a{
@@ -55,7 +127,7 @@ a{
 
 nav .Inicio{
     color:#cc2f2f;
-}
+} */
 
 #userContainer{
     padding: 10px;
