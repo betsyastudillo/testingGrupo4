@@ -103,7 +103,7 @@ app.put('/empresas/:id', async function (req, res) {
     if(!ObjectId.isValid(id)){
       return res.status(400).json({message: "El id no es válido"});
     }
-    const companiesCollection = (await connectToDatabase).collection(companyCollection);
+    const companiesCollection = (await connectToDatabase()).collection(companyCollection);
     await companiesCollection.updateOne({id},{$set: {name, password}});
     res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
   } catch (error) {
@@ -112,10 +112,25 @@ app.put('/empresas/:id', async function (req, res) {
   
 });
 
+//Ruta para eliminar empresa
+app.delete('/empresas/:id', async function(req, res) {
+  const { id } = req.params;
+  try {
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({message: "El id no es válido"});
+    }
+    const companiesCollection = (await connectToDatabase()).collection(companyCollection);
+    await companiesCollection.deleteOne({id});
+    res.json({message: "Empresa eliminada correctamente"});
+  } catch (error) {
+    res.status(400).json('Error al eliminar la empresa')
+  }
+});
+
 //Ruta para el registro de aplicaciones
 app.post('/aplicaciones', async(req, res)=> {
 
-  const {name, urlImage, numVist, score, review, idCompany} = req.body;
+  const {name, urlImage, numVist, score, review, category, idCompany} = req.body;
   const {id} = req.params;
   try {
     const apps = (await connectToDatabase()).collection(appCollection);
@@ -124,7 +139,7 @@ app.post('/aplicaciones', async(req, res)=> {
       return res.status(400).json({mensaje: "La app ya esta registrada en la base de datos"});
     }
 
-    const newApp = {name, urlImage, numVist, score, review, idCompany};
+    const newApp = {name, urlImage, numVist, score, review, category, idCompany};
     await apps.insertOne(newApp);
   } catch (error) {
     return res.status(500).json({mensaje: "error al guardar en el registros de aplicaciones", error});
@@ -149,17 +164,32 @@ app.put('/aplicaciones/:id', async function(req, res) {
   const {id} = req.params;
 
   try {
-    const {name, urlImage, numVist, score, review, idCompany} = req.body;
+    const {name, urlImage, numVist, score, review, category, idCompany} = req.body;
     if(!ObjectId.isValid(id)){
       return res.status(400).json({message: "El id no es válido"});
     }
-    const appsCollection = (await connectToDatabase).collection(appCollection);
-    await appsCollection.updateOne({id},{$set: {name, password, urlImage, numVist, score, review, idCompany}});
+    const appsCollection = (await connectToDatabase()).collection(appCollection);
+    await appsCollection.updateOne({id},{$set: {name, password, urlImage, numVist, score, review, category, idCompany}});
     res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
   } catch (error) {
     res.status(500).json({message: "no fue posible actualizar la base de datos"});
   }
   
+});
+
+//Ruta para el delete de aplicaciones
+app.delete('/aplicaciones/:id', async function(req, res) {
+  const { id } = req.params;
+  try {
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({message: "El id no es válido"});
+    }
+    const appsCollection = (await connectToDatabase()).collection(appCollection);
+    await appCollection.deleteOne({id});
+    res.json({message: "Aplicacion eliminada correctamente"});
+  } catch (error) {
+    res.status(400).json('Error al eliminar la aplicacion')
+  }
 });
 
 //Ruta para el registro de usuarios
@@ -202,13 +232,27 @@ app.put('/usuarios/:id', async function(req, res) {
     if(!ObjectId.isValid(id)){
       return res.status(400).json({message: "El id no es válido"});
     }
-    const usersCollection = (await connectToDatabase).collection(userCollection);
-    await usersCollection.updateOne({id},{$set: {email, password}});
+    const usersCollection = (await connectToDatabase()).collection(userCollection);
+    usersCollection.updateOne({id},{$set: {email, password}});
     res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
   } catch (error) {
     res.status(404).json({message: "no fue posible actualizar la información"});
   }
-  res.send(`Name ${id} ${name}, desc ${description}`);
+});
+
+//Ruta para eliminar usuarios
+app.delete('/usuarios/:id', async function(req, res) {
+  const { id } = req.params;
+  try {
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({message: "El id no es válido"});
+    }
+    const usersCollection = (await connectToDatabase()).collection(userCollection);
+    await usersCollection.deleteOne({id});
+    res.json({message: "Usuario eliminado correctamente"});
+  } catch (error) {
+    res.status(400).json('Error al eliminar el usuario');
+  }
 });
 
 /*
