@@ -6,6 +6,7 @@ import { Hero } from './Hero';
 import { Hero2 } from './Hero2';
 import { CardApp } from './CardApp';
 import { Categories } from './Categories';
+/*import { formReg } from './formReg';*/
 
 
 function App() {
