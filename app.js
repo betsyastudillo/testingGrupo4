@@ -21,7 +21,7 @@ const client = new MongoClient(uri, {
 
 const db = "tuBaseDeDatos";
 const companyCollection = "Empresas";
-const appCollection = "Aplicacion";
+const appCollection = "Aplicaciones";
 const userCollection = "Usuarios";
 
 async function connectToDatabase() {
@@ -44,7 +44,7 @@ function verifyPassword(password, hashedPassword, salt) {
     .toString('hex');
   return hashToCompare === hashedPassword;
 }
-
+//-------------------------------------------------- EMPRESAS -----------------------------------------
 // Ruta para registrar un nuevas empresas
 app.post('/empresas', async (req, res) => {
   const { name, email, password } = req.body;
@@ -150,22 +150,7 @@ app.put('/empresas', async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar la empresa', error });
   }
 });
-/*
-app.put('/empresas/:id', async function (req, res) {
-  const {name, email, password } = req.body;
-  try {
-    if(!ObjectId.isValid(id)){
-      return res.status(400).json({message: "El id no es válido"});
-    }
-    const companiesCollection = (await connectToDatabase()).collection(companyCollection);
-    await companiesCollection.updateOne({id},{$set: {name, email, password}});
-    res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
-  } catch (error) {
-    res.status(404).json({message: 'Error al ejecutar'});
-  }
-  
-});
-*/
+
 //Ruta para eliminar empresa
 app.delete('/empresas', async (req, res) => {
   const { email } = req.body;
@@ -187,41 +172,34 @@ app.delete('/empresas', async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar la empresa', error });
   }
 });
-/*
-app.delete('/empresas/:id', async function(req, res) {
-  const { id } = req.params;
-  try {
-    if(!ObjectId.isValid(id)){
-      return res.status(400).json({message: "El id no es válido"});
-    }
-    const companiesCollection = (await connectToDatabase()).collection(companyCollection);
-    console.log("preba ",companiesCollection);
-    await companiesCollection.deleteOne({id});
-   
-    
-    res.json({message: "Empresa eliminada correctamente"});
-  } catch (error) {
-    res.status(400).json('Error al eliminar la empresa')
-  }
-});
-*/
+
+//--------------------------------------------------- APLICACIONES ----------------------------------
 
 //Ruta para el registro de aplicaciones
 app.post('/aplicaciones', async(req, res)=> {
 
-  const {name, urlImage, numVist, score, review, category, idCompany} = req.body;
-  const {id} = req.params;
+  const {name, urlImage, numVist, score, review, category, companyEmail} = req.body;
+
   try {
     const apps = (await connectToDatabase()).collection(appCollection);
     const existingApp = await apps.findOne({ name });
     if(existingApp){
       return res.status(400).json({mensaje: "La app ya esta registrada en la base de datos"});
     }
+    
+    const companies = (await connectToDatabase()).collection(companyCollection);
+    const company = await companies.findOne({ email: companyEmail }); // Busca la empresa por nombre (puedes usar email si prefieres)
+
+    if (!company) {
+      return res.status(404).json({ message: "La empresa no existe en la base de datos" });
+    }
+    const idCompany = company._id;
 
     const newApp = {name, urlImage, numVist, score, review, category, idCompany};
     await apps.insertOne(newApp);
   } catch (error) {
-    return res.status(500).json({mensaje: "error al guardar en el registros de aplicaciones", error});
+    console.log(error);
+    return res.status(500).json({mensaje: "error al guardar en el registros de aplicaciones"});
   }
   
 });
@@ -239,98 +217,167 @@ app.get('/aplicaciones', async(req, res) => {
 });
 
 //Ruta para actualizar aplicaciones
-app.put('/aplicaciones/:id', async function(req, res) {
-  const {id} = req.params;
+app.put('/aplicaciones/:id', async (req, res) => {
+  const { name, urlImage, numVist, score, review, category, companyEmail } = req.body; // Campos a actualizar
+  const { id } = req.params; // ID de la aplicación a actualizar
 
   try {
-    const {name, urlImage, numVist, score, review, category, idCompany} = req.body;
-    if(!ObjectId.isValid(id)){
-      return res.status(400).json({message: "El id no es válido"});
+    const db = await connectToDatabase();
+    const apps = db.collection(appCollection);
+
+    // Verificar si la aplicación existe
+    const existingApp = await apps.findOne({ _id: new ObjectId(id) });
+    if (!existingApp) {
+      return res.status(404).json({ message: "La aplicación no existe" });
     }
-    const appsCollection = (await connectToDatabase()).collection(appCollection);
-    await appsCollection.updateOne({id},{$set: {name, password, urlImage, numVist, score, review, category, idCompany}});
-    res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
+
+    // Buscar el idCompany
+    const companies = db.collection(companyCollection);
+    const company = await companies.findOne({ email: companyEmail }); 
+
+    if (!company) {
+      return res.status(404).json({ message: "La empresa no existe en la base de datos" });
+    }
+    const idCompany = company._id; 
+
+    const updatedApp = {};
+
+    if (name) updatedApp.name = name;
+    if (urlImage) updatedApp.urlImage = urlImage;
+    if (numVist) updatedApp.numVist = numVist;
+    if (score) updatedApp.score = score;
+    if (review) updatedApp.review = review;
+    if (category) updatedApp.category = category;
+    updatedApp.idCompany = idCompany; // Asociar la empresa con la aplicación
+
+    // Actualizar la aplicación
+    await apps.updateOne(
+      { _id: new ObjectId(id) }, // Buscar por el ID de la aplicación
+      { $set: updatedApp } // Solo actualizamos los campos proporcionados
+    );
+
+    res.status(200).json({ message: "Aplicación actualizada correctamente" });
+
   } catch (error) {
-    res.status(500).json({message: "no fue posible actualizar la base de datos"});
+    console.error(error);
+    return res.status(500).json({ message: "Error al actualizar la aplicación", error });
   }
-  
 });
 
 //Ruta para el delete de aplicaciones
-app.delete('/aplicaciones/:id', async function(req, res) {
-  const { id } = req.params;
+app.delete('/aplicaciones/:id', async (req, res) => {
+  const { id } = req.params;  // El ID de la aplicación que se quiere eliminar
+
   try {
-    if(!ObjectId.isValid(id)){
-      return res.status(400).json({message: "El id no es válido"});
+    const db = await connectToDatabase();
+    const apps = db.collection(appCollection);
+
+    const existingApp = await apps.findOne({ _id: new ObjectId(id) });
+    
+    if (!existingApp) {
+      return res.status(404).json({ message: "La aplicación no existe" });
     }
-    const appsCollection = (await connectToDatabase()).collection(appCollection);
-    await appCollection.deleteOne({id});
-    res.json({message: "Aplicacion eliminada correctamente"});
+
+    // Eliminar la aplicación de la base de datos
+    await apps.deleteOne({ _id: new ObjectId(id) });
+
+    // Responder con mensaje de éxito
+    res.status(200).json({ message: "Aplicación eliminada correctamente" });
+
   } catch (error) {
-    res.status(400).json('Error al eliminar la aplicacion')
+    console.error(error);
+    return res.status(500).json({ message: "Error al eliminar la aplicación", error });
   }
 });
+//========================================= USUARIOS ====================================================================================
 
-//Ruta para el registro de usuarios
-
-app.post('/usuarios', async(req, res)=> {
-
-  const {email, password} = req.body
-  try {
-    const users = (await connectToDatabase()).collection(userCollection);
-    const existingUser = await users.findOne({ email });
-    if(existingUser){
-      return res.status(400).json({mensaje: "El usuario ya esta registrado en la base de datos"});
-    }
-    const hashedPassword = await argon2.hash(password);
-    const newUser = {email, password: hashedPassword};
-    await users.insertOne(newUser);
-  } catch (error) {
-    return res.status(500).json({mensaje: "error al guardar en el registros de usuarios", error});
-  }
+app.post('/usuarios', async (req, res) => {
+  const { email, password } = req.body;
   
+  try {
+    const usersCollection = (await connectToDatabase()).collection(userCollection);
+    
+    // Verificar si el usuario ya existe
+    const existingUser = await usersCollection.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'El usuario ya está registrado' });
+    }
+    
+    // Encriptar contraseña
+    const newUser = { email, password };
+    
+    await usersCollection.insertOne(newUser);
+    res.status(201).json({ message: 'Usuario registrado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al registrar el usuario', error });
+  }
 });
 
-
-//Ruta para obtener el listado de usuarios
-app.get('/usuarios', async(req, res) => {
+app.get('/usuarios', async (req, res) => {
   try {
-    const usersCollection =(await connectToDatabase()).collection(userCollection);
+    const usersCollection = (await connectToDatabase()).collection(userCollection);
     const users = await usersCollection.find().toArray();
-    res.json(users);
+    res.status(200).json(users);
   } catch (error) {
-    res.status(404).json({mensaje: "error en la base de datos", error});
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener los usuarios', error });
   }
 });
 
-//Ruta para actulizar usuarios
-app.put('/usuarios/:id', async function(req, res) {
-  const {id} = req.params;
-  try {
-    const {email, password} = req.body;
-    if(!ObjectId.isValid(id)){
-      return res.status(400).json({message: "El id no es válido"});
-    }
-    const usersCollection = (await connectToDatabase()).collection(userCollection);
-    usersCollection.updateOne({id},{$set: {email, password}});
-    res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
-  } catch (error) {
-    res.status(404).json({message: "no fue posible actualizar la información"});
-  }
-});
-
-//Ruta para eliminar usuarios
-app.delete('/usuarios/:id', async function(req, res) {
+app.put('/usuarios/:id', async (req, res) => {
   const { id } = req.params;
+  const { email, password } = req.body;
+  
   try {
-    if(!ObjectId.isValid(id)){
-      return res.status(400).json({message: "El id no es válido"});
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'El id no es válido' });
     }
+    
     const usersCollection = (await connectToDatabase()).collection(userCollection);
-    await usersCollection.deleteOne({id});
-    res.json({message: "Usuario eliminado correctamente"});
+    
+    const updateData = {};
+    if (email) updateData.email = email;
+    if (password) {
+      const { hashedPassword } = hashPassword(password);
+      updateData.password = hashedPassword;
+    }
+    
+    const result = await usersCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+    
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    
+    res.status(200).json({ message: 'Usuario actualizado correctamente' });
   } catch (error) {
-    res.status(400).json('Error al eliminar el usuario');
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar el usuario', error });
+  }
+});
+
+app.delete('/usuarios/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'El id no es válido' });
+    }
+    
+    const usersCollection = (await connectToDatabase()).collection(userCollection);
+    const result = await usersCollection.deleteOne({ _id: new ObjectId(id) });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    
+    res.status(200).json({ message: 'Usuario eliminado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al eliminar el usuario', error });
   }
 });
 
