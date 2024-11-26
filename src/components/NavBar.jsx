@@ -62,11 +62,11 @@ export function NavBar() {
             </ul>
 
             <h3
-              class="me-4"
+              className="me-4"
               onClick={toggleBuscador}
               style={{ cursor: "pointer", fontSize: "20px" }}
             >
-              <i class="bi bi-search"></i>
+              <i className="bi bi-search"></i>
             </h3>
             {mostrarBuscador && (
               <input
@@ -76,8 +76,8 @@ export function NavBar() {
                 style={{ maxWidth: "300px" }}
               />
             )}
-            <h3 class="me-4" style={{ fontSize: "20px" }}>
-              <i class="bi bi-info-circle"></i>
+            <h3 className="me-4" style={{ fontSize: "20px" }}>
+              <i className="bi bi-info-circle"></i>
             </h3>
             <img
               src="https://tairo.cssninja.io/img/avatars/10.svg"
@@ -89,6 +89,10 @@ export function NavBar() {
               className="btn btn-primary ms-3"
               data-bs-toggle="modal"
               data-bs-target="#loginModal"
+              style={{
+                backgroundColor: '#133D87',
+                marginRight: '10px'
+              }}
             >
               Iniciar sesión
             </button>
