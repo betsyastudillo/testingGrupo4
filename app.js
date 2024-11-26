@@ -20,7 +20,7 @@ const client = new MongoClient(uri, {
 });
 
 const db = "tuBaseDeDatos";
-const companyCollection = "empresas";
+const companyCollection = "Empresas";
 const appCollection = "Aplicacion";
 const userCollection = "Usuarios";
 
