@@ -17,7 +17,7 @@ const client = new MongoClient(uri, {
 });
 
 const dbName = "tuBaseDeDatos";
-const collectionName = "usuarios";
+const collectionName = "empresas";
 
 async function connectToDatabase() {
   if (!client.isConnected) await client.connect();
