@@ -19,6 +19,7 @@ const client = new MongoClient(uri, {
 const db = "tuBaseDeDatos";
 const companyCollection = "empresas";
 const appCollection = "Aplicacion";
+const userCollection = "Usuarios";
 
 async function connectToDatabase() {
   if (!client.isConnected) await client.connect();
@@ -41,7 +42,7 @@ app.post('/empresas', async (req, res) => {
     }
 
     // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 3);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = { name, email, password: hashedPassword};
 
     // Insertar nueva empresa
@@ -52,7 +53,7 @@ app.post('/empresas', async (req, res) => {
     //
   }catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al registrar la empresa' });
+    res.status(500).json({ message: 'Error al registrar la empresa',error });
   }
 });
 
@@ -93,11 +94,68 @@ app.get('/empresas/:id', async(req, res) => {
 });
 
 //Ruta para el registro de aplicaciones
+app.post('/empresas/:id/aplicaciones', async(req, res)=> {
 
-app.post('/empresas/aplicaciones', (req, res)=> {
-  res.send('POST request to the homepage')
-})
+  const {name, urlImage, numVist, score, review} = req.body;
+  const {id} = req.params;
+  try {
+    const apps = (await connectToDatabase()).collection(appCollection);
+    const existingApp = await apps.findOne({ name });
+    if(existingApp){
+      return res.status(400).json({mensaje: "La app ya esta registrada en la base de datos"});
+    }
 
+    const newApp = {name, urlImage, numVist, score, review, id};
+    await apps.insertOne(newApp);
+  } catch (error) {
+    return res.status(500).json({mensaje: "error al guardar en el registros de aplicaciones", error});
+  }
+  
+});
+
+
+//Ruta para obtener el listado de aplicaciones
+app.get('empresas/:id/aplicaciones', async(req, res) => {
+  try {
+    const appsCollection =(await connectToDatabase()).collection(appCollection);
+    const apps = await appsCollection.find().toArray();
+    res.json(apps);
+  } catch (error) {
+    res.status(404).json({mensaje: "error en la base de datos", error});
+  }
+});
+
+//Ruta para el registro de usuarios
+
+app.post('/usuarios', async(req, res)=> {
+
+  const {email, password} = req.body
+  try {
+    const users = (await connectToDatabase()).collection(userCollection);
+    const existingUser = await users.findOne({ email });
+    if(existingUser){
+      return res.status(400).json({mensaje: "El usuario ya esta registrado en la base de datos"});
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = {email, password: hashedPassword};
+    await users.insertOne(newUser);
+  } catch (error) {
+    return res.status(500).json({mensaje: "error al guardar en el registros de usuarios", error});
+  }
+  
+});
+
+
+//Ruta para obtener el listado de aplicaciones
+app.get('/usuarios', async(req, res) => {
+  try {
+    const usersCollection =(await connectToDatabase()).collection(userCollection);
+    const users = await usersCollection.find().toArray();
+    res.json(users);
+  } catch (error) {
+    res.status(404).json({mensaje: "error en la base de datos", error});
+  }
+});
 
 /*
 // Ruta para iniciar sesión
