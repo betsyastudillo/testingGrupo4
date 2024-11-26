@@ -1,8 +1,20 @@
-// import './CreateTodoButton.css'
+import { useNavigate } from "react-router-dom";
 
 export function CardApp() {
+  const navigate = useNavigate();
+
+  const handleRedirect = () => {
+    navigate("/review-company");
+  }
+
   return (
-    <div id="componente" className="card shadow-sm">
+    <div 
+      id="componente" 
+      className="card shadow-sm" 
+      onClick={handleRedirect}
+      style={{
+        cursor: 'pointer'
+      }}>
       <img
         src="https://tairo.cssninja.io/img/apps/3.jpg"
         className="card-img-top"

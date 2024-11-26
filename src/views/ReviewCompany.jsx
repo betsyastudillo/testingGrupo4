@@ -1,13 +1,13 @@
 export function ReviewCompany() {
     return(
         <div classNameName="container mt-5">
-            <div classNameName="d-flex justify-content-between align-items-center mb-4">
-                <h2 classNameName="fww-bold">Project Details</h2>
-            </div>
+            {/* <div classNameName="d-flex justify-content-between align-items-center mb-4">
+                <h2 classNameName="fww-bold"></h2>
+            </div> */}
             <div classNameName="row">
                 <div classNameName="col-lg-8">
                     <div className="card p-4 mb-4">
-                        <h3 classNameName="fw-bold">Delivery App Project</h3>
+                        <h3 classNameName="fw-bold">Nombre Proyecto</h3>
                         <p classNameName="text-muted">UI/UX Design</p>
                         <p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quid iudicant sensus?

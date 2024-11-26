@@ -15,9 +15,9 @@ function App() {
         <div className="container-fluid">
           <Routes>
             {/* Rutas de Contenido */}
-            <Route path="/" element={HomeView()} />
-            <Route path="/form-register" element={FormCreateCompany()} />
-            <Route path="/review-company" element={ReviewCompany()} />
+            <Route path="/" element={<HomeView />} />
+            <Route path="/form-register" element={<FormCreateCompany />} />
+            <Route path="/review-company" element={<ReviewCompany />} />
           </Routes>
         </div>
         <Carrusel />
