@@ -1,7 +1,7 @@
 // Importar módulos necesarios
 const express = require('express');
 const { ObjectId, MongoClient, ServerApiVersion } = require('mongodb');
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -45,7 +45,7 @@ app.post('/empresas', async (req, res) => {
     }
 
     // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password, {hashLength: 16});
     const newUser = { name, email, password: hashedPassword};
 
     // Insertar nueva empresa
@@ -113,9 +113,9 @@ app.put('/empresas/:id', async function (req, res) {
 });
 
 //Ruta para el registro de aplicaciones
-app.post('/empresas/:id/aplicaciones', async(req, res)=> {
+app.post('/aplicaciones', async(req, res)=> {
 
-  const {name, urlImage, numVist, score, review} = req.body;
+  const {name, urlImage, numVist, score, review, idCompany} = req.body;
   const {id} = req.params;
   try {
     const apps = (await connectToDatabase()).collection(appCollection);
@@ -124,7 +124,7 @@ app.post('/empresas/:id/aplicaciones', async(req, res)=> {
       return res.status(400).json({mensaje: "La app ya esta registrada en la base de datos"});
     }
 
-    const newApp = {name, urlImage, numVist, score, review, id};
+    const newApp = {name, urlImage, numVist, score, review, idCompany};
     await apps.insertOne(newApp);
   } catch (error) {
     return res.status(500).json({mensaje: "error al guardar en el registros de aplicaciones", error});
@@ -134,7 +134,7 @@ app.post('/empresas/:id/aplicaciones', async(req, res)=> {
 
 
 //Ruta para obtener el listado de aplicaciones
-app.get('empresas/:id/aplicaciones', async(req, res) => {
+app.get('/aplicaciones', async(req, res) => {
   try {
     const appsCollection =(await connectToDatabase()).collection(appCollection);
     const apps = await appsCollection.find().toArray();
@@ -142,6 +142,24 @@ app.get('empresas/:id/aplicaciones', async(req, res) => {
   } catch (error) {
     res.status(404).json({mensaje: "error en la base de datos", error});
   }
+});
+
+//Ruta para actualizar aplicaciones
+app.put('/aplicaciones/:id', async function(req, res) {
+  const {id} = req.params;
+
+  try {
+    const {name, urlImage, numVist, score, review, idCompany} = req.body;
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({message: "El id no es válido"});
+    }
+    const appsCollection = (await connectToDatabase).collection(appCollection);
+    await appsCollection.updateOne({id},{$set: {name, password, urlImage, numVist, score, review, idCompany}});
+    res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
+  } catch (error) {
+    res.status(500).json({message: "no fue posible actualizar la base de datos"});
+  }
+  
 });
 
 //Ruta para el registro de usuarios
@@ -155,7 +173,7 @@ app.post('/usuarios', async(req, res)=> {
     if(existingUser){
       return res.status(400).json({mensaje: "El usuario ya esta registrado en la base de datos"});
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password);
     const newUser = {email, password: hashedPassword};
     await users.insertOne(newUser);
   } catch (error) {
@@ -165,7 +183,7 @@ app.post('/usuarios', async(req, res)=> {
 });
 
 
-//Ruta para obtener el listado de aplicaciones
+//Ruta para obtener el listado de usuarios
 app.get('/usuarios', async(req, res) => {
   try {
     const usersCollection =(await connectToDatabase()).collection(userCollection);
@@ -176,6 +194,22 @@ app.get('/usuarios', async(req, res) => {
   }
 });
 
+//Ruta para actulizar usuarios
+app.put('/usuarios/:id', async function(req, res) {
+  const {id} = req.params;
+  try {
+    const {email, password} = req.body;
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({message: "El id no es válido"});
+    }
+    const usersCollection = (await connectToDatabase).collection(userCollection);
+    await usersCollection.updateOne({id},{$set: {email, password}});
+    res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
+  } catch (error) {
+    res.status(404).json({message: "no fue posible actualizar la información"});
+  }
+  res.send(`Name ${id} ${name}, desc ${description}`);
+});
 
 /*
 // Ruta para iniciar sesión
