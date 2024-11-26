@@ -3,12 +3,15 @@ const express = require('express');
 const { ObjectId, MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcryptjs');
 const app = express();
+const bodyParser = require('body-parser');
+
 
 // Configuración básica
 const port = 4000;
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json()); // Para manejar datos en formato JSON en las solicitudes
+app.use(bodyParser.json());
 
 // Conectar a MongoDB Atlas
 const uri = "mongodb+srv://kenGr:asdf-13579@ken.zmmwe.mongodb.net/?retryWrites=true&w=majority&appName=Ken";
@@ -93,6 +96,22 @@ app.get('/empresas/:id', async(req, res) => {
   res.send('GET request to the homepage')
 });
 
+//Ruta de actualizacion para la empresa
+app.put('/empresas/:id', async function (req, res) {
+  const { id, name, password } = req.body;
+  try {
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({message: "El id no es válido"});
+    }
+    const companiesCollection = (await connectToDatabase).collection(companyCollection);
+    await companiesCollection.updateOne({id},{$set: {name, password}});
+    res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
+  } catch (error) {
+    res.status(404).json({message: 'Error al ejecutar'});
+  }
+  
+});
+
 //Ruta para el registro de aplicaciones
 app.post('/empresas/:id/aplicaciones', async(req, res)=> {
 
@@ -156,6 +175,7 @@ app.get('/usuarios', async(req, res) => {
     res.status(404).json({mensaje: "error en la base de datos", error});
   }
 });
+
 
 /*
 // Ruta para iniciar sesión
