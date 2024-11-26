@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import app from '../axiosConfig'
-import { useEffect, useState } from "react";
+// import app from '../axiosConfig'sfrom "react";
 
 export function AuthUser() {
 
