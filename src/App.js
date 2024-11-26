@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { NavBar } from './components/NavBar';
 import { HomeView } from './views/HomeView';
 import { FormCreateCompany } from './form/FormCreateCompany';
+import { Footer } from "./components/Footer";
+import { Carrusel } from "./components/Carousel";
 
 
 function App() {
@@ -17,7 +19,9 @@ function App() {
             <Route path="/form-register" element={FormCreateCompany()} />
           </Routes>
         </div>
+        <Carrusel />
       </div>
+      <Footer />
     </Router>
   );
 }
