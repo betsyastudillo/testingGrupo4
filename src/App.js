@@ -5,7 +5,7 @@ import { HomeView } from './views/HomeView';
 import { FormCreateCompany } from './form/FormCreateCompany';
 import { Footer } from "./components/Footer";
 import { Carrusel } from "./components/Carousel";
-
+import { ReviewCompany } from "./views/ReviewCompany";
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
             {/* Rutas de Contenido */}
             <Route path="/" element={HomeView()} />
             <Route path="/form-register" element={FormCreateCompany()} />
+            <Route path="/review-company" element={ReviewCompany()} />
           </Routes>
         </div>
         <Carrusel />

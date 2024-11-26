@@ -5,6 +5,8 @@ import { Routes, Route } from "react-router-dom";
 import Home from "/";
 import FormCreateCompany from "./form/FormCreateCompany";
 import FormRegisterApp from "./form/FormCreateApp";
+import ReviewCompany  from "./form/ReviewCompany";
+
 
 export const AppRoutes = () => {
   return (
@@ -12,6 +14,7 @@ export const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/form-create-company" element={<FormCreateCompany />} />
       <Route path="/form-register" element={<FormRegisterApp />} />
+      <Route path="/review-company" element={<ReviewCompany />} />
     </Routes>
   );
 };
