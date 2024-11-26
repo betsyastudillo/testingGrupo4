@@ -14,7 +14,7 @@ function App() {
           <Routes>
             {/* Rutas de Contenido */}
             <Route path="/" element={HomeView()} />
-            <Route path="/login" element={FormCreateCompany()} />
+            <Route path="/form-register" element={FormCreateCompany()} />
           </Routes>
         </div>
       </div>

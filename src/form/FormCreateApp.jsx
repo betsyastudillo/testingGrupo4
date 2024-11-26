@@ -1,8 +1,13 @@
 export function FormCreateApp() {
   return (
-    <form>
-      <label>Nombre de la empresa:</label>
-        <input class="form-control" input="text"></input>
-    </form>
+    <div>
+      <h3>Registra tu empresa</h3>
+      <p>Nombre de la empresa</p>
+      <input className="form-control" type="text"></input>
+      <p>Correo electrónico</p>
+      <input className="form-control" type="text"></input>
+      <p>Contraseña</p>
+      <input className="form-control" type="text"></input>
+    </div>
   )
 }
