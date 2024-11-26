@@ -1,6 +1,6 @@
 // Importar módulos necesarios
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { ObjectId, MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcryptjs');
 const app = express();
 
@@ -16,42 +16,92 @@ const client = new MongoClient(uri, {
   serverApi: { version: ServerApiVersion.v1, strict: true }
 });
 
-const dbName = "tuBaseDeDatos";
-const collectionName = "empresas";
+const db = "tuBaseDeDatos";
+const companyCollection = "empresas";
+const appCollection = "Aplicacion";
 
 async function connectToDatabase() {
   if (!client.isConnected) await client.connect();
-  return client.db(dbName).collection(collectionName);
+  return client.db(db);
 }
 
-// Ruta para registrar un nuevo usuario
-app.post('/register', async (req, res) => {
-  const { name, email, password, photo } = req.body;
+// Ruta para registrar un nuevas empresas
+app.post('/empresas', async (req, res) => {
+  const { name, email, password } = req.body;
   
   try {
-    const collection = await connectToDatabase();
-    
-    // Verificar si el usuario ya existe
-    const existingUser = await collection.findOne({ email });
+    const dataBase = await connectToDatabase();
+    // Verificar la existencia de la empresa
+    const existingUser = await dataBase.collection(companyCollection).findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'El usuario ya está registrado' });
+      return res.status(400).json({ message: 'La empresa ya está registrado'});
+      //Devolver al incio de sección
+      //
+      //
     }
 
     // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { name, email, password: hashedPassword, photo };
+    const hashedPassword = await bcrypt.hash(password, 3);
+    const newUser = { name, email, password: hashedPassword};
 
-    // Insertar nuevo usuario
-    await collection.insertOne(newUser);
-    res.status(201).json({ message: 'Usuario registrado correctamente' });
-  } catch (error) {
+    // Insertar nueva empresa
+    await dataBase.collection(companyCollection).insertOne(newUser);
+    res.status(201).json({ message: 'Empresa registrada correctamente' }); //Es inecesario 
+    //devolver al inicio de sección
+    //
+    //
+  }catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al registrar usuario' });
+    res.status(500).json({ message: 'Error al registrar la empresa' });
   }
 });
 
+//Ruta de consulta para lista de empresa
+app.get('/empresas', async(req, res) => {
+  try {
+    const companiesCollection = (await connectToDatabase()).collection(companyCollection);
+    const companies = await companiesCollection.find().toArray();
+    res.json(companies);
+  } catch (error) {
+    res.status(404).json({mensaje: "Error en la base de datos"});
+  }
+});
+
+//Ruta de consulta de una sola empresa
+
+app.get('/empresas/:id', async(req, res) => {
+  try {
+    const {id} = req.params;
+
+    if(!ObjectId.isValid(id)){
+      return res.status(400).json({mensaje: "El id no es válido"});
+    }
+    const companiesCollection = (await connectToDatabase()).collection(companyCollection);
+    const company = await companiesCollection.findOne({_id: new ObjectId(id)});
+
+    if (!company){
+      return res.status(404).json({mensaje: "La empresa no fue encontrada"});
+    }
+
+    res.json(company);
+
+  } catch (error) {
+    res.status(500).json({mensaje: "Error en la base de datos", error});
+  }
+
+  res.send('GET request to the homepage')
+});
+
+//Ruta para el registro de aplicaciones
+
+app.post('/empresas/aplicaciones', (req, res)=> {
+  res.send('POST request to the homepage')
+})
+
+
+/*
 // Ruta para iniciar sesión
-app.post('/login', async (req, res) => {
+app.post('/empresas/', async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -75,7 +125,7 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Error al iniciar sesión' });
   }
 });
-
+*/
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() }); // Usamos memoria para almacenar la imagen como un buffer
 
