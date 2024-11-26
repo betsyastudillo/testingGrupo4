@@ -17,7 +17,7 @@ const client = new MongoClient(uri, {
 });
 
 const dbName = "tuBaseDeDatos";
-const collectionName = "usuarios";
+const collectionName = "empresas";
 
 async function connectToDatabase() {
   if (!client.isConnected) await client.connect();
@@ -26,7 +26,7 @@ async function connectToDatabase() {
 
 // Ruta para registrar un nuevo usuario
 app.post('/register', async (req, res) => {
-  const { name, email, password, photo } = req.body;
+  const { name, email, password, photo, aplications } = req.body;
   
   try {
     const collection = await connectToDatabase();
@@ -34,19 +34,20 @@ app.post('/register', async (req, res) => {
     // Verificar si el usuario ya existe
     const existingUser = await collection.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'El usuario ya está registrado' });
+      return res.status(400).json({ message: 'La empresa ya está registrada'});
+      //poner devolucion a inciar sección
     }
 
     // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { name, email, password: hashedPassword, photo };
+    const hashedPassword = await bcrypt.hash(password, 3);
+    const newUser = { name, email, password: hashedPassword, photo, aplications };
 
     // Insertar nuevo usuario
     await collection.insertOne(newUser);
-    res.status(201).json({ message: 'Usuario registrado correctamente' });
+    res.status(201).json({ message: 'Empresa registrada correctamente' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al registrar usuario' });
+    res.status(500).json({ message: 'Error al registrar Empresa' });
   }
 });
 
