@@ -29,6 +29,15 @@ async function connectToDatabase() {
   return client.db(db);
 }
 
+// Obtener la dirección IP local de la máquina
+const ipAddress = '10.170.134.161';  // Sustituye con la IP local de tu máquina
+
+// Ruta principal
+app.get('/', (req, res) => {
+  res.send('¡Hola, mundo!');
+});
+
+
 // Función para generar hash con SHA256
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
   const hashedPassword = crypto
@@ -443,6 +452,6 @@ app.post('/updateProfilePic', upload.single('photo'), async (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+  console.log(`Servidor escuchando en http://${ipAddress}:${port}`);
 });
 
