@@ -1,7 +1,7 @@
 // Importar módulos necesarios
 const express = require('express');
 const { ObjectId, MongoClient, ServerApiVersion } = require('mongodb');
-const argon2 = require('argon2');
+const crypto = require('crypto');
 const app = express();
 const bodyParser = require('body-parser');
 
@@ -29,6 +29,22 @@ async function connectToDatabase() {
   return client.db(db);
 }
 
+// Función para generar hash con SHA256
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hashedPassword = crypto
+    .pbkdf2Sync(password, salt, 1000, 16, 'sha256') // 1000 iteraciones, 16 bytes
+    .toString('hex');
+  return { hashedPassword, salt };
+}
+
+// Función para verificar contraseñas
+function verifyPassword(password, hashedPassword, salt) {
+  const hashToCompare = crypto
+    .pbkdf2Sync(password, salt, 1000, 16, 'sha256')
+    .toString('hex');
+  return hashToCompare === hashedPassword;
+}
+
 // Ruta para registrar un nuevas empresas
 app.post('/empresas', async (req, res) => {
   const { name, email, password } = req.body;
@@ -37,6 +53,7 @@ app.post('/empresas', async (req, res) => {
     const dataBase = await connectToDatabase();
     // Verificar la existencia de la empresa
     const existingUser = await dataBase.collection(companyCollection).findOne({ email });
+    
     if (existingUser) {
       return res.status(400).json({ message: 'La empresa ya está registrado'});
       //Devolver al incio de sección
@@ -45,11 +62,11 @@ app.post('/empresas', async (req, res) => {
     }
 
     // Encriptar la contraseña
-    const hashedPassword = await argon2.hash(password, {hashLength: 16});
-    const newUser = { name, email, password: hashedPassword};
+    const {hashedPassword, salt} = hashPassword(password);
+    const newCompany = {name, email, password: hashedPassword}
 
     // Insertar nueva empresa
-    await dataBase.collection(companyCollection).insertOne(newUser);
+    await dataBase.collection(companyCollection).insertOne(newCompany);
     res.status(201).json({ message: 'Empresa registrada correctamente' }); //Es inecesario 
     //devolver al inicio de sección
     //
@@ -97,22 +114,80 @@ app.get('/empresas/:id', async(req, res) => {
 });
 
 //Ruta de actualizacion para la empresa
+app.put('/empresas', async (req, res) => {
+  const { email, name, password } = req.body; // Recibimos el email, el nombre y la contraseña para actualizar
+
+  try {
+    const dataBase = await connectToDatabase();
+    // Verificar si la empresa existe
+    const existingUser = await dataBase.collection(companyCollection).findOne({ email });
+    if (!existingUser) {
+      return res.status(404).json({ message: 'La empresa no existe' });
+    }
+
+    // Crear el objeto de actualización
+    const updateData = {};
+
+    if (name) {
+      updateData.name = name; // Solo actualizar si se proporciona un nuevo nombre
+    }
+
+    if (password) {
+      const { hashedPassword, salt } = hashPassword(password);
+      updateData.password = hashedPassword;
+    }
+
+    // Actualizar la empresa
+    await dataBase.collection(companyCollection).updateOne(
+      { email },
+      { $set: updateData } // El operador $set permite actualizar solo los campos proporcionados
+    );
+
+    res.status(200).json({ message: 'Empresa actualizada correctamente' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al actualizar la empresa', error });
+  }
+});
+/*
 app.put('/empresas/:id', async function (req, res) {
-  const { id, name, password } = req.body;
+  const {name, email, password } = req.body;
   try {
     if(!ObjectId.isValid(id)){
       return res.status(400).json({message: "El id no es válido"});
     }
     const companiesCollection = (await connectToDatabase()).collection(companyCollection);
-    await companiesCollection.updateOne({id},{$set: {name, password}});
+    await companiesCollection.updateOne({id},{$set: {name, email, password}});
     res.status(200).json({ success: true, message: 'Información actualizada correctamente' });
   } catch (error) {
     res.status(404).json({message: 'Error al ejecutar'});
   }
   
 });
-
+*/
 //Ruta para eliminar empresa
+app.delete('/empresas', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const dataBase = await connectToDatabase();
+    
+    // Verificar si la empresa existe
+    const existingCompany = await dataBase.collection(companyCollection).findOne({ email });
+    if (!existingCompany) {
+      return res.status(404).json({ message: 'La empresa no existe' });
+    }
+
+    // Eliminar la empresa
+    await dataBase.collection(companyCollection).deleteOne({ email });
+    res.status(200).json({ message: 'Empresa eliminada correctamente' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al eliminar la empresa', error });
+  }
+});
+/*
 app.delete('/empresas/:id', async function(req, res) {
   const { id } = req.params;
   try {
@@ -120,12 +195,16 @@ app.delete('/empresas/:id', async function(req, res) {
       return res.status(400).json({message: "El id no es válido"});
     }
     const companiesCollection = (await connectToDatabase()).collection(companyCollection);
+    console.log("preba ",companiesCollection);
     await companiesCollection.deleteOne({id});
+   
+    
     res.json({message: "Empresa eliminada correctamente"});
   } catch (error) {
     res.status(400).json('Error al eliminar la empresa')
   }
 });
+*/
 
 //Ruta para el registro de aplicaciones
 app.post('/aplicaciones', async(req, res)=> {
