@@ -2,18 +2,25 @@ import { useState } from 'react'
 import { AuthUser } from "./AuthUser"
 
 export function NavBar() {
-
   const [mostrarBuscador, setMostrarBuscador] = useState(false);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleBuscador = () => {
     setMostrarBuscador(!mostrarBuscador);
   };
 
+  const handleLogin = () => {
+    setIsLoggedIn(true); // Simula iniciar sesión
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false); // Simula cerrar sesión
+  };
+
   // function modalLogin({is}) {
   //   if (!isOpen) return null;
-
   // }
 
   return (
@@ -79,12 +86,26 @@ export function NavBar() {
             <h3 className="me-4" style={{ fontSize: "20px" }}>
               <i className="bi bi-info-circle"></i>
             </h3>
+            {isLoggedIn ? (
+              <>
             <img
               src="https://tairo.cssninja.io/img/avatars/10.svg"
               className="rounded-circle border"
               width="40"
               alt="Avatar 3"
             />
+            <button
+                  className="btn btn-secondary ms-3"
+                  onClick={handleLogout}
+                  style={{
+                    backgroundColor: '#d9534f',
+                    color: '#fff',
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
             <button
               className="btn btn-primary ms-3"
               data-bs-toggle="modal"
@@ -96,6 +117,7 @@ export function NavBar() {
             >
               Iniciar sesión
             </button>
+            )}
           </div>
         </div>
       </nav>

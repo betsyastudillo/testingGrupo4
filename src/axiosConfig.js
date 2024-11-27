@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const app = axios.create({
-  baseURL: 'http://10.170.134.161:4000',
+  baseURL: 'https://api-hackaton-lwg2n6jhya-uc.a.run.app',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

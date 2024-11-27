@@ -4,7 +4,6 @@ import { NavBar } from './components/NavBar';
 import { HomeView } from './views/HomeView';
 import { FormCreateCompany } from './form/FormCreateCompany';
 import { Footer } from "./components/Footer";
-import { Carrusel } from "./components/Carousel";
 import { ReviewCompany } from "./views/ReviewCompany";
 
 function App() {
@@ -20,7 +19,6 @@ function App() {
             <Route path="/review-company" element={<ReviewCompany />} />
           </Routes>
         </div>
-        <Carrusel />
       </div>
       <Footer />
     </Router>
