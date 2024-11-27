@@ -40,7 +40,7 @@ export function AuthUser() {
             {FormLogin()}
             <div className="d-flex mt-4">
               <p>¿No estás registrado? </p>
-              <a href="." onClick={handleRedirect} role="button">Registrate</a>
+              <a href = "" onClick={handleRedirect} role="button">Registrate</a>
             </div>
           </div>
         </div>

@@ -1,60 +1,92 @@
+import '../assets/css/ReviewCompany.css'
+import { useParams, useLocation } from "react-router-dom";
+import { useCompanies } from "../CompanyContext";
+
 export function ReviewCompany() {
+
+  const { id } = useParams();
+  const { companies } = useCompanies();
+  const { state } = useLocation();
+
+  const company = companies.find((company) => company.id === id);
+
+  if (!company || !state || !state.company) {
+    return <h1>Empresa no encontrada</h1>;
+  }
+
+
   return(
     <div classNameName="container mt-5">
       <div classNameName="row">
       <div className="d-flex justify-content-around flex-wrap">
-        <div className="card p-4 mb-4 col-sm-3">
-          <h3 className="fw-bold">Nombre Proyecto</h3>
-          <p className="text-muted">UI/UX Design</p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quid iudicant sensus?
-            Primum quid tu dicis breve?
-          </p>
+        <div className="card p-4 mb-4 col-sm-4">
           <div className="d-flex align-items-center mb-4">
             <img
-              src="https://via.placeholder.com/40"
-              alt="Profile"
-              className="rounded-circle me-2"
+              src={company.imageLogoSrc}
+              className="rounded-circle border me-2"
+              width="60"
+              height="60"
+              alt="Logo"
             />
-            <span>Clarke G.</span>
+          <h3 className="fw-bold">{company.title}</h3>
           </div>
-          <div className="row text-center">
+          <p className="text-muted">{company.subtitle}</p>
+          <div className="row">
             <div className="col">
-              <div className="mb-2">
-                <i className="bi bi-pencil-square fs-3"></i>
-              </div>
-              <p className="fw-bold">UI/UX Design</p>
+              <h4>Beneficios</h4>
+              <ul>
+                {company.beneficios.map((servicio, index) => (
+                  <li key={index}>
+                    <h6>{servicio.title}</h6>
+                    <p>{servicio.description}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="col">
-              <div className="mb-2">
-                <i className="bi bi-clock fs-3"></i>
-              </div>
-              <p className="fw-bold">1 Week Sprints</p>
+          </div>
+          <div className="row">
+            <div className="d-flex justify-content-center gap-3 mt-4">
+              <a
+                href={company.linkAS} // URL de la App Store
+                className="btn btn-store"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i className="bi bi-apple me-2"></i>
+                <div className="text">
+                  <span className="small">Descárgala en</span>
+                  <br />
+                  <strong>App Store</strong>
+                </div>
+              </a>
+
+              <a
+                href={company.linkPS} // URL de la Play Store
+                className="btn btn-store"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i className="bi bi-google-play me-2"></i>
+                <div className="text">
+                  <span className="small">Descárgala en</span>
+                  <br />
+                  <strong>Play Store</strong>
+                </div>
+              </a>
             </div>
-            <div className="col">
-              <div className="mb-2">
-                <i className="bi bi-calendar fs-3"></i>
-              </div>
-              <p className="fw-bold">3 Months</p>
-            </div>
-            <div className="col">
-              <div className="mb-2">
-                <i className="bi bi-cash fs-3"></i>
-              </div>
-              <p className="fw-bold">Fixed</p>
-            </div>
+
           </div>
         </div>
 
         {/* Segunda tarjeta */}
-        <div className="card p-4 mb-4 col-sm-8">
+        <div className="card p-4 mb-4 col-sm-7">
           <h4 className="fw-bold mb-3">Reseñas de la App</h4>
-          <div className="d-flex flex-wrap gap-3">
-          {[1, 2, 3, 4, 5].map((_, index) => (
+          <div className="d-flex flex-wrap gap-3 justify-content-center">
+          {[1, 2, 3, 4].map((_, index) => (
             <div className="card p-3" style={{ width: "18rem" }} key={index}>
               <div className="d-flex align-items-center mb-3">
                 <img
-                  src='@/public/assets/img/anonimo.png'
+                  src='https://i.postimg.cc/4dNDmTsj/image.png'
                   alt="User Profile"
                   className="rounded-circle me-2"
                   style={{ width: "50px", height: "50px" }}
@@ -68,7 +100,7 @@ export function ReviewCompany() {
                 {Array.from({ length: Math.floor(Math.random() * 5) + 1 }).map((_, starIndex) => (
                   <i className="bi bi-star-fill text-warning" key={starIndex}></i>
                 ))}
-                {Array.from({ length: 5 - Math.floor(Math.random() * 5) - 1 }).map((_, starIndex) => (
+                {Array.from({ length: 5 - Math.floor(Math.random() * 2) - 1 }).map((_, starIndex) => (
                   <i className="bi bi-star text-muted" key={starIndex}></i>
                 ))}
               </div>
@@ -78,33 +110,6 @@ export function ReviewCompany() {
       </div>
     </div>
 
-        <div className="col-lg-4">
-          <div className="card p-4 mb-4">
-            <h4 className="fw-bold">Customer</h4>
-            <p className="mb-2">Flashlite</p>
-            <div className="progress mb-3">
-              <div className="progress-bar" role="progressbar" style={{width: '75%'}}>75%</div>
-            </div>
-          </div>
-
-          <div className="card p-4 mb-4">
-            <h4 className="fw-bold">Project Tools</h4>
-            <ul className="list-unstyled">
-              <li className="mb-2"><i className="bi bi-palette me-2"></i> Sketch</li>
-              <li className="mb-2"><i className="bi bi-vector-pen me-2"></i> Illustrator</li>
-              <li className="mb-2"><i className="bi bi-brush me-2"></i> Photoshop</li>
-            </ul>
-          </div>
-
-          <div className="card p-4">
-            <h4 className="fw-bold">Project Stacks</h4>
-            <ul className="list-unstyled">
-              <li className="mb-2"><i className="bi bi-code me-2"></i> HTML5</li>
-              <li className="mb-2"><i className="bi bi-code-slash me-2"></i> JavaScript</li>
-              <li className="mb-2"><i className="bi bi-boxes me-2"></i> Vue</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
   )

@@ -58,7 +58,7 @@ export function FormCreateApp() {
               className="form-control"
               id="category"
               name="category"
-              value={formData.email}
+              value={formData.category}
               onChange={handleChange}
               style={{ maxWidth: '500px'}}
               required

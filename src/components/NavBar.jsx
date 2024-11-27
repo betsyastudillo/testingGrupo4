@@ -50,23 +50,38 @@ export function NavBar() {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul
+              className="navbar-nav mx-auto mb-2 mb-lg-0"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <li className="nav-item">
                 <a className="nav-link active" aria-current="page" href="/">
                   Inicio
                 </a>
               </li>
-              <li className="nav-item">
+              <li className="nav-item ms-5">
                 <a className="nav-link" href="/">
                   Juegos
                 </a>
               </li>
-              <li className="nav-item">
+              <li className="nav-item ms-5">
                 <a className="nav-link" href="/">
-                  Apps
+                  Empresariales
+                </a>
+              </li>
+              <li className="nav-item ms-5">
+                <a className="nav-link" href="/">
+                  Informativo
                 </a>
               </li>
             </ul>
+
+  {/* Aquí sigue el resto del contenido como buscador e íconos */}
+
 
             <h3
               className="me-4"
